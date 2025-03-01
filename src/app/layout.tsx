@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Roboto} from "next/font/google";
 import "./globals.css";
+import localFont from "next/font/local";
+import { ThemeProvider } from "next-themes";
+
+const toboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
+const myFont = localFont({
+  src: './PatrickHand-Regular.ttf',
+
+})
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +36,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    // <html lang="en">
+    //   <body
+    //     // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    //     className={myFont.className}
+    //   >
+    //     {children}
+    //   </body>
+    // </html>
+    <html lang="en" suppressHydrationWarning>
+        <head />
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
   );
 }

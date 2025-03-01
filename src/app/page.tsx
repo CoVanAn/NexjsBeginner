@@ -1,4 +1,7 @@
+import Card from "@/components/card";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import meomeo from "../../public/images/mewmew.png"
 
 export default function Home() {
   return (
@@ -30,13 +33,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
+           
             Deploy now
           </a>
           <a
@@ -48,7 +45,17 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+        <Card />
+        <Image
+              // className="dark:invert"
+              // src="/images/mewmew.png"
+              src={meomeo}
+              alt="Vercel logomark"
+              width={200}
+              height={200}
+            />
       </main>
+
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
@@ -95,6 +102,7 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
+        <Button className="p-5 new" variant="destructive">Click me</Button>
       </footer>
     </div>
   );
