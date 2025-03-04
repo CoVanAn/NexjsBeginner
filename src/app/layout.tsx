@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Roboto} from "next/font/google";
 import "./globals.css";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
+import Header from "@/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 const toboto = Roboto({
   variable: "--font-roboto",
@@ -47,12 +49,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
         <head />
         <body>
+          <Toaster />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-          >
+           >
+            <Header />
             {children}
           </ThemeProvider>
         </body>

@@ -45,15 +45,15 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <Card />
-        <Image
+        {/* <Card /> */}
+        {/* <Image
               // className="dark:invert"
               // src="/images/mewmew.png"
               src={meomeo}
               alt="Vercel logomark"
               width={200}
               height={200}
-            />
+            /> */}
       </main>
 
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
@@ -102,7 +102,6 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
-        <Button className="p-5 new" variant="destructive">Click me</Button>
       </footer>
     </div>
   );
