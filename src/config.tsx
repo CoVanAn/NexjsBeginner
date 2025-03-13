@@ -7,7 +7,7 @@ const configSchema = z.object({
 const configProject = configSchema.safeParse(process.env);
 
 if(!configProject.success) {
-    console.error(configProject.error.issues);
+    // console.error(configProject.error.issues);
     throw new Error('Các giá trị khau báo trong file .env không hợp lệ');
 }
 

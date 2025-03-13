@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { set, z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema';
 import { Eye, EyeOff } from "lucide-react"; // Import icon từ lucide-react
 import { toast } from "sonner"
+import { useAppContext} from "@/app/AppProvider";
 
 const LoginForm = () => {
     const form = useForm<LoginBodyType>({
@@ -25,6 +26,8 @@ const LoginForm = () => {
             password: '',
         },
     })
+
+    const {setSessionToken} = useAppContext();
 
     // Trạng thái hiển thị mật khẩu
     const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +54,7 @@ const LoginForm = () => {
                 }
                 return data;
             });
-            console.log(result);
+            // console.log(result);
             toast("Thành công", {
                 description: "Đăng nhập thành công",
                 action: {
@@ -59,6 +62,25 @@ const LoginForm = () => {
                     onClick: () => console.log("Undo"),
                 },
             })
+            const resultFromNextServer = await fetch('/api/auth', {
+                method: 'POST',
+                body: JSON.stringify(result),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(async (res) => {
+                const payload = await res.json();
+                const data = {
+                    status: res.status,
+                    payload: payload
+                }
+
+                if (!res.ok) {
+                    throw data;
+                }
+                return data;
+            });
+            setSessionToken(resultFromNextServer.payload.data.token);
         }
         catch (error: any) {
             // console.log(err);
