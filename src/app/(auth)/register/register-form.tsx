@@ -17,6 +17,10 @@ import { Input } from "@/components/ui/input"
 import { RegisterBody, RegisterBodyType } from '@/schemaValidations/auth.schema';
 
 import { Eye, EyeOff } from "lucide-react"; // Import icon từ lucide-react
+import authApiRequest from '@/apiRequests/auth';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+// import { sessionToken } from '@/lib/http';
 
 const RegisterForm = () => {
     const form = useForm<RegisterBodyType>({
@@ -29,6 +33,7 @@ const RegisterForm = () => {
         },
     })
 
+    const router = useRouter();
     // Trạng thái hiển thị mật khẩu
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -37,14 +42,45 @@ const RegisterForm = () => {
     const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
     async function onSubmit(values: z.infer<typeof RegisterBody>) {
-        const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        }).then((res) => res.json());
-        console.log(result);
+        try {
+            const result = await authApiRequest.register(values);
+            // console.log(result);
+            toast("Thành công", {
+                description: "Đăng kí thành công",
+                action: {
+                    label: "Undo",
+                    onClick: () => console.log("Undo"),
+                },
+            })
+            await authApiRequest.auth({ sessionToken: result.payload.data.token });
+            // setSessionToken(result.payload.data.token);
+            // sessionToken.value = result.payload.data.token;
+            router.push("/me");
+        }
+        catch (error: any) {
+            console.log(error);
+            const errors = error.payload.errors as {
+                message: string;
+                field: string;
+            }[]
+            const status = error.status as number
+            if (status === 422) {
+                errors.forEach((err) => {
+                    form.setError(err.field as 'email' | 'password', {
+                        type: "server",
+                        message: err.message,
+                    });
+                });
+            } else {
+                toast("Lỗi", {
+                    description: error.payload.message,
+                    action: {
+                        label: "Undo",
+                        onClick: () => console.log("Undo"),
+                    },
+                })
+            }
+        }
     }
 
     return (
@@ -123,9 +159,9 @@ const RegisterForm = () => {
                     )}
                 />
                 {/* <div className="w-full  flex items-center justify-center"> */}
-                    <Button className="w-full bg-sky-400 h-12 text-lg font-bold" type="submit">
-                        Đăng ký
-                    </Button>
+                <Button className="w-full bg-sky-400 h-12 text-lg font-bold" type="submit">
+                    Đăng ký
+                </Button>
                 {/* </div> */}
             </form>
         </Form>
@@ -133,3 +169,7 @@ const RegisterForm = () => {
 }
 
 export default RegisterForm;
+function setSessionToken(token: string) {
+    throw new Error('Function not implemented.');
+}
+
