@@ -3,6 +3,8 @@ import { LoginResType } from "@/schemaValidations/auth.schema";
 
 type CustomOptions = RequestInit & { baseURL?: string | undefined };
 
+//Lỗi dòng mấy file nào cũng có thể xảy ra, nên ta sẽ tạo một class riêng để xử
+//lý lỗi này
 class HttpError extends Error {
     status: number;
     paylpad: any;
@@ -13,6 +15,8 @@ class HttpError extends Error {
     }
 }
 
+//Khai báo sessionToken, chỉ sử dụng ở phía client
+//Khi sử dụng sessionToken, ta sẽ gán giá trị cho nó, sau đó lấy giá trị của nó
 class SessionToken {
   private token = '';
   get value() {
@@ -25,11 +29,11 @@ class SessionToken {
     this.token = token;
   }
 }
-
 //Session token này chỉ thực hiện ở phía client, không thực hiện ở phía server
-
 export const clientSessionToken = new SessionToken();
 
+//Hàm request này sẽ thực hiện gửi request lên server
+//Hàm này sẽ thực hiện gửi request lên server, nếu có lỗi thì sẽ throw ra lỗi
 const request = async<Responst>
     (method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions | undefined) => {
     const body = options?.body ? JSON.stringify(options.body) : undefined;
@@ -37,8 +41,12 @@ const request = async<Responst>
         'Content-Type': 'application/json',
         Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : "",
     }
-    const baseURL = options?.baseURL === undefined ? process.env.NEXT_PUBLIC_API_URL : options.baseURL;
 
+//Nếu options không có baseURL thì sẽ lấy giá trị từ biến môi trường (env)
+//Nếu có thì sẽ lấy giá trị từ options, truyền vào '' nếu không có giá trị, dồng nghĩa với việc ta gọi API đến NextIS server
+const baseURL = options?.baseURL === undefined ? process.env.NEXT_PUBLIC_API_URL : options.baseURL;
+
+//Nếu url bắt đầu bằng '/' thì sẽ thêm baseURL vào trước url, nếu không thì sẽ thêm '/' vào giữa baseURL và url
     const fullURL = url.startsWith('/') ? baseURL + url : baseURL + '/' + url;
     const res = await fetch(fullURL, {
         ...options,
@@ -66,6 +74,8 @@ const request = async<Responst>
     return data;
 }
 
+//Hàm http này sẽ thực hiện gửi request lên server
+//Hàm này sẽ thực hiện gửi request lên server, nếu có lỗi thì sẽ throw ra lỗi
 const http = {
     get<Response>(
       url: string,
