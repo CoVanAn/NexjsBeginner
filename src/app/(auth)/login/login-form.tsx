@@ -18,9 +18,11 @@ import { Eye, EyeOff } from "lucide-react"; // Import icon từ lucide-react
 import { toast } from "sonner"
 import authApiRequest from '@/apiRequests/auth';
 import { useRouter } from 'next/navigation';
+import { handleErrorAPI } from '@/lib/utils';
 // import { sessionToken } from '@/lib/http';
 
 const LoginForm = () => {
+    const [loading, setLoading] = useState(false);
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
         defaultValues: {
@@ -36,6 +38,7 @@ const LoginForm = () => {
     const togglePassword = () => setShowPassword(!showPassword);
 
     async function onSubmit(values: z.infer<typeof LoginBody>) {
+        setLoading(true);
         try {
             const result = await authApiRequest.login(values);
             // console.log(result);
@@ -47,33 +50,13 @@ const LoginForm = () => {
                 },
             })
             await authApiRequest.auth({ sessionToken: result.payload.data.token });
-            // setSessionToken(result.payload.data.token);
-            // sessionToken.value = result.payload.data.token;
             router.push("/me");
         }
         catch (error: any) {
-            console.log(error);
-            const errors = error.payload.errors as {
-                message: string;
-                field: string;
-            }[]
-            const status = error.status as number
-            if (status === 422) {
-                errors.forEach((err) => {
-                    form.setError(err.field as 'email' | 'password', {
-                        type: "server",
-                        message: err.message,
-                    });
-                });
-            } else {
-                toast("Lỗi", {
-                    description: error.payload.message,
-                    action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
-                    },
-                })
-            }
+            handleErrorAPI({ error, setError: form.setError });
+        }
+        finally {
+            setLoading(false);
         }
     }
 
